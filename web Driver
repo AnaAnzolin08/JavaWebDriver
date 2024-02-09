@@ -1,0 +1,103 @@
+package modulos.Produtos;
+
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import paginas.LoginPage;
+
+import java.time.Duration;
+
+@DisplayName("Teste Web do Modulo de Produtos ")
+public class ProdutoTest {
+    private WebDriver navegador;
+
+    @BeforeEach
+    public void beforeEach() {
+        //Abrir o navagador
+        System.setProperty("webdriver.chorme.driver","C:\\Program Files\\chromedriver115\\chromedriver");
+        this.navegador = new ChromeDriver();
+
+        //Vou maximinizar a tela
+        this.navegador.manage().window().maximize();
+        //Vou definir um tempo de espera padrao de 5 segundos
+        this.navegador.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //Navegar para a pagina da Lojinha Web
+        this.navegador.get("http://165.227.93.41/lojinha-web/v2/");
+    }
+
+    @Test
+    @DisplayName("Nao é permitido registrar um produto co valor igual a zero")
+    public void TesteNaoePermitidoRegistroProdutoComValorDeZero()  {
+     // fazer logingit remote add origin git@github.com:AnaAnzolin08/lojinhaAutomacaoWeb-10.git
+        String mensagemApresentada = new LoginPage(navegador)
+            .infomarOUsuario("admin")
+            .informaraSenha("admin")
+            .submenterFormulariodeLogin()
+            .acessarFormularioDeAdicaoNovoProduto()
+            .informarNomedoProduto("Macbook Pro")
+            .informarValorDoProduto("000")
+            .informarCoresDoProduto("preto,branco")
+            .submeterFormularioDeAdicaoComErro()
+            .capturarMensagemApresentada();
+        Assertions.assertEquals("O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00", mensagemApresentada);
+        // fechar o navegador
+
+        }
+
+    @Test
+    @DisplayName("Nao e permetido registtrar o valor maior que 7.000,00 ")
+    public void TesteNaoepermitidoRegistrarProdutoComValorAcimaDeSeteMil()  {
+        String mensagemApresentada = new LoginPage(navegador)
+                .infomarOUsuario("admin")
+                .informaraSenha("admin")
+                .submenterFormulariodeLogin()
+                .acessarFormularioDeAdicaoNovoProduto()
+                .informarNomedoProduto("Smart 70 ")
+                .informarValorDoProduto("700001")
+                .informarCoresDoProduto(" preto")
+                .submeterFormularioDeAdicaoComErro()
+                .capturarMensagemApresentada();
+
+        Assertions.assertEquals("O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00",mensagemApresentada);
+    }
+
+        @Test
+        @DisplayName("Posso adicionar produtos que estejam na faixa de 0.01 e 7.000,00")
+        public void testPossoAdicionarProdutosDeUmCentavoaSeteMilReais() {
+        String mesagemApresentada = new LoginPage(navegador)
+                    .infomarOUsuario("admin")
+                    .informaraSenha("admin")
+                    .submenterFormulariodeLogin()
+                    .acessarFormularioDeAdicaoNovoProduto()
+                    .informarNomedoProduto("Iphone")
+                    .informarValorDoProduto("500000")
+                    .informarCoresDoProduto("Roxo")
+                    .submeterFormularioDeAdicaoComSucesso()
+                    .capturarMensagemApresentada();
+
+            //Produto adicionado com sucesso
+            Assertions.assertEquals("Produto adicionado com sucesso",mesagemApresentada);
+        }
+        @Test
+        @DisplayName("Posso adicionar produtos que estejam na faixa de 7.000,00")
+        public void testPossoAdicionarProdutoDeSeteMilReais() {
+        String mensagemApresentada = new LoginPage(navegador)
+                    .infomarOUsuario("admin")
+                    .informaraSenha("admin")
+                    .submenterFormulariodeLogin()
+                    .acessarFormularioDeAdicaoNovoProduto()
+                    .informarNomedoProduto("Trakinas")
+                    .informarValorDoProduto("70000")
+                    .informarCoresDoProduto("Rosa")
+                    .submeterFormularioDeAdicaoComSucesso()
+                    .capturarMensagemApresentada();
+
+            Assertions.assertEquals("Produto adicionado com Sucesso",mensagemApresentada);
+        }
+        @AfterEach
+        public void afterEach() {
+        navegador.quit();
+    }
+}
